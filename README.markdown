@@ -3,6 +3,8 @@ DistrictBuilder
 
 [DistrictBuilder](http://www.districtbuilder.org/) is software created by the [Public Mapping Project](http://www.publicmapping.org/resources/software).
 
+The development environment is docker-compose for services inside a Vagrant virtual machine.
+
 
 Installation
 ------------
@@ -23,70 +25,53 @@ $ ./scripts/update
 $ ./scripts/load_development_data
 ```
 
+:zzz:
+
+#### Development Environment Setup ####
+
+`./scripts/setup` provisions the virtual machine. It brings up an Ubuntu 14.04 virtual machine
+with docker installed. `vagrant ssh` gets you into the virtual machine so you can run commands.
+From there, running `./scripts/update` builds containers. The rest of the setup happens either
+directly or indirectly through a setup management command and is addressed in Django application
+setup, next.
+ 
 #### Django Application Setup ####
 
 The django application includes a management command that handles application configuration
 based on two input files: `settings.py` in the `publicmapping` app in `django/publicmapping`
-and `config.xml`. Below is an explanation of what each of these flags does:
+and `config.xml`.
+
+##### Data Setup #####
+
+The first script to run is `./scripts/load_development_data`. It is not fast, and it's currently
+recommended that you run it overnight. We specifically would like to improve performance of the
+data load.
+
+This script will do several things
+
+- Fetch zipped shapefile data for Virginia into a specific location
+- Drop and recreate the `district_builder**
+- Run database migrations: create the relationships that data will be loaded into
+- Load shapes from shapefiles at different levels: create records for the shapes and characteristics
+  in the configured shapefiles
+- Nest the shapes at different levels into each other: calculate the spatial relationships between
+  shapes at different zoom levels
+- Load some template plans: initialize the database with several example plans that users can start
+  drawing with
+- Create database views: create the database objects that GeoServer will use to
+  create tiles of specific subjects
+- Configure GeoServer: create layers and styles that will be served as tiles to the frontend
+
+**IMPORTANT**: after you configure GeoServer, from outside the vm, run `vagrant rsync-back`. If you
+don't yet have that plugin, run `vagrant plugin install vagrant-rsync-back`. If you don't do this,
+your host won't pick up the files that were created in GeoServer configuration, so when you reboot
+your vm, the files won't be present in the guest either, and then they won't be in the GeoServer
+docker container. That will break GeoServer in a confusing and surprising way, and you'll be sad,
+so just make sure you `rsync-back`.
 
 ##### Internationalization #####
 
 To compile language files, use the `-l` flag.
-
-##### Data Setup #####
-
-The following flags are all executed as part of `scripts/load_development_data`.
-
-###### `-gX`: Loading Geolevels ######
-
-The `-gX` flag loads geolevel `X` into the database. Where to find those geolevels is determined
-by the `config.xml` file. Each geolevel in the xml has an entry like:
-
-```xml
-<Shapefile path="/data/some_path.shp">
-  <Fields>
-  ...
-  </Fields>
-</Shapefile>
-```
-
-that tells the management command where to look for geounits in this level, and what fields to
-care about in each shapefile record. The lowest numbered geolevel is for the smallest size, so
-if you had only counties and states, for example, counties would be `-g0`, and states would be
-`-g1`.
-
-###### `-nX`: Nesting Geolevels ######
-
-Nesting geolevels rolls up smaller geounits into their larger parents, based on geography,
-accumulating record information along the way.
-
-###### `-t`: Create plan templates ######
-
-The `-t` flag creates some example plans in the database to use as baselines for creating user
-plans. If it can't find information it needs to create a template, it skips that template after
-printing a warning message and doesn't fail.
-
-###### Database Views ######
-
-The `-V` flag creates the database views necessary for geoserver to show tiles. It's run as part
-of `load_development_data`.
-
-
-###### `-G`: Configure Geoserver ######
-
-The `-G` flag configures the geoserver container. To succeed, you must have correct database
-connection information in `config.xml` and a correct `SLD_ROOT` in `settings.py`.
-
-The example database connection information in `config.xml` is:
-
-```xml
-<Database name="district_builder"
-          user="district_builder"
-          password="district_builder"
-          host="postgres.internal.districtbuilder.com"/>
-```
-
-The default `SLD_ROOT` in `settings.py` is `/opt/sld`.
 
 Support
 -------

@@ -10,7 +10,7 @@ function usage() {
     echo -n \
 "Usage: $(basename "$0") [config.xml]
 
-Load a database dump from S3
+Load Virginia shapefiles from S3
 "
 }
 

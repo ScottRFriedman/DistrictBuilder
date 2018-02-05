@@ -1194,7 +1194,8 @@ class SpatialUtils:
         # resources like its copy of openlayers and other things
 
         settings = requests.get(
-            'http://geoserver.internal.districtbuilder.com:8080/geoserver/rest/settings.json'
+            'http://geoserver.internal.districtbuilder.com:8080/geoserver/rest/settings.json',
+            headers=self.headers['default']
         ).json()
 
         settings['global']['proxyBaseUrl'] = 'http://localhost:8080/geoserver'
@@ -1630,6 +1631,14 @@ class SpatialUtils:
                 'dataLinks': [],
                 'nativeCRS': 'EPSG:3785',
                 'srs': 'EPSG:3785',
+                # Set the bounding box to the maximum spherical mercator extent
+                # in order to avoid all issues with geowebcache tile offsets
+                'nativeBoundingBox': {
+                    'minx': '%0.1f' % -20037508.342789244,
+                    'miny': '%0.1f' % -20037508.342789244,
+                    'maxx': '%0.1f' % 20037508.342789244,
+                    'maxy': '%0.1f' % 20037508.342789244
+                },
                 'maxFeatures': settings.FEATURE_LIMIT + 1,
                 'attributes': {
                     'attribute': attributes
