@@ -10,7 +10,7 @@ function usage() {
     echo -n \
 "Usage: $(basename "$0") [config.xml]
 
-Load Virginia shapefiles from S3
+Configure the application with demo data
 "
 }
 
@@ -62,6 +62,10 @@ function load_dev_data() {
     echo "Configuring geoserver"
     docker-compose \
         exec -T django ./manage.py setup "${configPath}" -G
+
+    echo "Creating translation files"
+    docker-compose \
+        exec -T django ./manage.py setup "${configPath}" -l
 
 }
 

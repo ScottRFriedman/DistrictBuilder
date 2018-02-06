@@ -22,7 +22,7 @@ $ cp django/publicmapping/config/config.dist.xml django/publicmapping/config/con
 $ ./scripts/setup
 $ vagrant ssh
 $ ./scripts/update
-$ ./scripts/load_development_data
+$ ./scripts/configure
 ```
 
 :zzz:
@@ -34,7 +34,7 @@ with docker installed. `vagrant ssh` gets you into the virtual machine so you ca
 From there, running `./scripts/update` builds containers. The rest of the setup happens either
 directly or indirectly through a setup management command.
  
-Then, run `./scripts/load_development_data`. It is not fast, and it's currently
+Then, run `./scripts/configure`. It is not fast, and it's currently
 recommended that you run it overnight. We are working on ways to improve the speed of loading
 data.
 
@@ -53,7 +53,7 @@ This script will do several things
   create tiles of specific subjects
 - Configure GeoServer: create layers and styles that will be served as tiles to the frontend
 
-If you want to know what's actually going on in `load_development_data`, these are the setup flags
+If you want to know what's actually going on in `configure`, these are the setup flags
 that the script executes:
 
 - `-g0 -g1 -g2`: load the zeroth through second geolevels. These geolevels are configured in the
