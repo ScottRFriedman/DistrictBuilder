@@ -29,16 +29,34 @@ $ ./scripts/configure
 
 #### Development Environment Setup ####
 
+##### `config.xml` #####
+
+Your configuration file contains everything specific to your instance of District Builder. As part
+of setup, some of the values in the configuration file will be parsed to environment variables, and
+others will be used to tell the application setup scripts where to find data and what to do with it.
+
+In broad strokes, the configuration file:
+
+- tells django and other services about secrets they need to know
+- tells the setup scripts where data live
+- tells the setup scripts what the data contain, i.e., what fields are present on each geographic
+  record
+- tells the setup scripts how to create calculator functions for manipulating those fields
+
+Ease of interacting with the configuration file is a planned area for future development.
+
+##### Setting up your application #####
+
 `./scripts/setup` provisions the virtual machine. It brings up an Ubuntu 14.04 virtual machine
 with docker installed. `vagrant ssh` gets you into the virtual machine so you can run commands.
 From there, running `./scripts/update` builds containers. The rest of the setup happens either
-directly or indirectly through a setup management command.
+directly or indirectly through a setup management command. To get started, run
+`./script/setup`, followed by `vagrant ssh`, followed by `./scripts/update`.
  
-Then, run `./scripts/configure`. It is not fast, and it's currently
-recommended that you run it overnight. We are working on ways to improve the speed of loading
-data.
+Then, run `./scripts/configure`. It is not fast. Currently, it takes several hours, with the exact
+time depending on hardware. We are working on ways to improve the speed of loading data.
 
-This script will do several things
+The script will do several things
 
 - Fetch zipped shapefile data for Virginia into a specific location
 - Drop and recreate the `district_builder**
@@ -78,16 +96,8 @@ that the script executes:
           host="postgres.internal.districtbuilder.com"/>
 ```
 
-##### Internationalization #####
-
-Compiling language flags happens through the `--languages` flag to the `setup` management command.
-To run this step, run
-
-```bash
-$ docker-compose exec django ./manage.py setup config/config.xml --languages
-```
-
-from `/vagrant` in the vm.
+- `-l`: generate language files. This step ensures that the files necessary for internationalization
+  are present in the django container.
 
 Support
 -------
