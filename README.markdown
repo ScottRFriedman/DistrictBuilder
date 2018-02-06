@@ -32,20 +32,11 @@ $ ./scripts/load_development_data
 `./scripts/setup` provisions the virtual machine. It brings up an Ubuntu 14.04 virtual machine
 with docker installed. `vagrant ssh` gets you into the virtual machine so you can run commands.
 From there, running `./scripts/update` builds containers. The rest of the setup happens either
-directly or indirectly through a setup management command and is addressed in Django application
-setup, next.
+directly or indirectly through a setup management command.
  
-#### Django Application Setup ####
-
-The django application includes a management command that handles application configuration
-based on two input files: `settings.py` in the `publicmapping` app in `django/publicmapping`
-and `config.xml`.
-
-##### Data Setup #####
-
-The first script to run is `./scripts/load_development_data`. It is not fast, and it's currently
-recommended that you run it overnight. We specifically would like to improve performance of the
-data load.
+Then, run `./scripts/load_development_data`. It is not fast, and it's currently
+recommended that you run it overnight. We are working on ways to improve the speed of loading
+data.
 
 This script will do several things
 
@@ -62,34 +53,23 @@ This script will do several things
   create tiles of specific subjects
 - Configure GeoServer: create layers and styles that will be served as tiles to the frontend
 
-**IMPORTANT**: after you configure GeoServer, from outside the vm, run `vagrant rsync-back`. If you
-don't yet have that plugin, run `vagrant plugin install vagrant-rsync-back`. If you don't do this,
-your host won't pick up the files that were created in GeoServer configuration, so when you reboot
-your vm, the files won't be present in the guest either, and then they won't be in the GeoServer
-docker container. That will break GeoServer in a confusing and surprising way, and you'll be sad,
-so just make sure you `rsync-back`.
+If you want to know what's actually going on in `load_development_data`, these are the setup flags
+that the script executes:
 
-Nesting geolevels rolls up smaller geounits into their larger parents, based on geography,
-accumulating record information along the way.
-
-###### `-t`: Create plan templates ######
-
-The `-t` flag creates some example plans in the database to use as baselines for creating user
-plans. If it can't find information it needs to create a template, it skips that template after
-printing a warning message and doesn't fail.
-
-###### Database Views ######
-
-The `-V` flag creates the database views necessary for geoserver to show tiles. It's run as part
-of `load_development_data`.
-
-
-###### `-G`: Configure Geoserver ######
-
-The `-G` flag configures the geoserver container. To succeed, you must have correct database
-connection information in `config.xml` and a correct `SLD_ROOT` in `settings.py`.
-
-The example database connection information in `config.xml` is:
+- `-g0 -g1 -g2`: load the zeroth through second geolevels. These geolevels are configured in the
+  specified configuration file. This step loads geographies and attributes of those geographies
+  into the database.
+- `-n0 -n1 -n2`: nest the zeroth through second geolevels. This step establishes the spatial
+  relationships between the geographies in each geolevel in the database.
+- `-t`: create plan templates. This creates some example plans in the database to use as baselines
+  for creating user plans. If it can't find information it needs to create a template, it skips that
+  template after printing a warning message and doesn't fail.
+- `--views`: create database views for geographies and attributes. This step creates a database view
+  for each attribute each for each geolevel. These views are what GeoServer uses to create tiles.
+- `-G`: configure GeoServer. This step creates the layers and styles that the frontend will
+  eventually receive from GeoServer in the database and GeoServer container. This step will fail
+  if you don't have a valid database connection configuration for your environment in `config.xml`.
+  The example database connection information in `config.xml` is:
 
 ```xml
 <Database name="district_builder"
@@ -97,9 +77,17 @@ The example database connection information in `config.xml` is:
           password="district_builder"
           host="postgres.internal.districtbuilder.com"/>
 ```
+
 ##### Internationalization #####
 
-To compile language files, use the `-l` flag.
+Compiling language flags happens through the `--languages` flag to the `setup` management command.
+To run this step, run
+
+```bash
+$ docker-compose exec django ./manage.py setup config/config.xml --languages
+```
+
+from `/vagrant` in the vm.
 
 Support
 -------
