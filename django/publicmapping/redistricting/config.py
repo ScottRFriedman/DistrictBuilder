@@ -1668,13 +1668,12 @@ class SpatialUtils:
         @returns: True if the resource exists and is readable.
         """
         try:
-            conn = httplib.HTTPConnection(self.host, self.port)
-            conn.request('GET', url, None, self.headers['default'])
-            rsp = conn.getresponse()
-            rsp.read()  # and discard
-            conn.close()
-            return rsp.status == 200
-        except:
+            resp = requests.get(
+                url, headers=self.headers['default'], params={'quietOnNotFound': True}
+            )
+            resp.raise_for_status()
+            return resp.status_code == 200
+        except requests.exceptions.RequestException:
             # HTTP 400, 500 errors are also considered exceptions by the httplib
             return False
 

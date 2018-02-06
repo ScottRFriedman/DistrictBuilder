@@ -69,6 +69,34 @@ your vm, the files won't be present in the guest either, and then they won't be 
 docker container. That will break GeoServer in a confusing and surprising way, and you'll be sad,
 so just make sure you `rsync-back`.
 
+Nesting geolevels rolls up smaller geounits into their larger parents, based on geography,
+accumulating record information along the way.
+
+###### `-t`: Create plan templates ######
+
+The `-t` flag creates some example plans in the database to use as baselines for creating user
+plans. If it can't find information it needs to create a template, it skips that template after
+printing a warning message and doesn't fail.
+
+###### Database Views ######
+
+The `-V` flag creates the database views necessary for geoserver to show tiles. It's run as part
+of `load_development_data`.
+
+
+###### `-G`: Configure Geoserver ######
+
+The `-G` flag configures the geoserver container. To succeed, you must have correct database
+connection information in `config.xml` and a correct `SLD_ROOT` in `settings.py`.
+
+The example database connection information in `config.xml` is:
+
+```xml
+<Database name="district_builder"
+          user="district_builder"
+          password="district_builder"
+          host="postgres.internal.districtbuilder.com"/>
+```
 ##### Internationalization #####
 
 To compile language files, use the `-l` flag.
