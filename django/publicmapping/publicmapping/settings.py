@@ -208,15 +208,6 @@ MAP_SERVER = os.getenv('MAP_SERVER_HOST')
 MAP_SERVER_USER = os.getenv('MAP_SERVER_ADMIN')
 MAP_SERVER_PASS = os.getenv('MAP_SERVER_PASSWORD')
 
-BASE_MAPS = 'None'
-MAP_SERVER_NS = 'pmp'
-MAP_SERVER_NSHREF = 'https://github.com/PublicMapping/'
-FEATURE_LIMIT = 100
-
-ADJACENCY = False
-
-CONVEX_CHOROPLETH = False
-
 # TODO: Make sending email work
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
