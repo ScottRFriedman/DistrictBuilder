@@ -6,4 +6,3 @@ REDIS_URL = 'redis://:{password}@{host}:{port}/{db}'.format(
     port=os.getenv('KEY_VALUE_STORE_PORT'),
     db=os.getenv('KEY_VALUE_STORE_DB'),
 )
-
