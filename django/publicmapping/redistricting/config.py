@@ -1629,15 +1629,22 @@ class SpatialUtils:
                 'keywords': [],
                 'metadataLinks': [],
                 'dataLinks': [],
-                'nativeCRS': 'EPSG:3785',
-                'srs': 'EPSG:3785',
+                'nativeCRS': 'EPSG:900913',
+                'srs': 'EPSG:900913',
                 # Set the bounding box to the maximum spherical mercator extent
                 # in order to avoid all issues with geowebcache tile offsets
                 'nativeBoundingBox': {
                     'minx': '%0.1f' % -20037508.342789244,
-                    'miny': '%0.1f' % -20037508.342789244,
+                    'miny': '%0.1f' % -20048966.1040146,
                     'maxx': '%0.1f' % 20037508.342789244,
-                    'maxy': '%0.1f' % 20037508.342789244
+                    'maxy': '%0.1f' % 20048966.104014594,
+                },
+                'latLonBoundingBox': {
+                    'minx': -180,
+                    'miny': -85.1,
+                    'maxx': 180,
+                    'maxy': 85.1,
+                    'crs': 'EPSG:4326'
                 },
                 'maxFeatures': settings.FEATURE_LIMIT + 1,
                 'attributes': {
