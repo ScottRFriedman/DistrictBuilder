@@ -1681,7 +1681,6 @@ class SpatialUtils:
             resp.raise_for_status()
             return resp.status_code == 200
         except requests.exceptions.RequestException:
-            # HTTP 400, 500 errors are also considered exceptions by the httplib
             return False
 
     def _rest_config(self, method, url, data=None, headers=None):
